@@ -1,10 +1,12 @@
-import { HomeStyle, TextStyle, InputTask, InputDurationInMinutes, TimerStyle, SeparatorStyle, ButtonStartStyle, ButtonInterruptStyle } from '@/pages/home/style'
+import { HomeStyle, ButtonStartStyle, ButtonInterruptStyle } from '@/pages/home/styles'
 import { validationResolver } from '@/pages/home/validation'
 import { HandPalm, Play } from 'phosphor-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { differenceInSeconds } from 'date-fns'
 import * as uuid from 'uuid'
+import { FormStyle } from '@/pages/home/components/FormStyle'
+import { TimerStyle } from '@/pages/home/components/TimerStyle'
 
 type InputTimer = {
     task: string
@@ -80,8 +82,6 @@ export function Home () {
         }
     }, [activeCycle, activeCycleId, totalSeconds])
 
-    console.log(cycles)
-
     const minutesRemaining = Math.floor(currentSeconds / 60)
     const secondsRemaining = currentSeconds % 60
 
@@ -114,29 +114,10 @@ export function Home () {
     return (
         <HomeStyle>
             <form onSubmit={ handleSubmit(handleFormSubmit) }>
-                <TextStyle>
-                    <label htmlFor='task'>I'll work in</label>
-                    <InputTask type='text' id='task' list='task-suggestions' disabled={ !!activeCycle } minLength={ 3 } placeholder='give a name to your task' { ...register('task') } />
 
-                    <datalist id='task-suggestions'>
-                        <option value="Task !" />
-                        <option value="Task !" />
-                        <option value="Task !" />
-                        <option value="Task !" />
-                    </datalist>
+                <FormStyle />
 
-                    <label htmlFor='durationInMinutes'>during</label>
-                    <InputDurationInMinutes type='number' id='durationInMinutes' disabled={ !!activeCycle } placeholder='5' step={ 5 } min={ 5 } max={ 60 } { ...register('durationInMinutes', { valueAsNumber: true }) } />
-                    <span>minutes.</span>
-                </TextStyle>
-
-                <TimerStyle>
-                    <span>{ minutes[0] }</span>
-                    <span>{ minutes[1] }</span>
-                    <SeparatorStyle>:</SeparatorStyle>
-                    <span>{ seconds[0] }</span>
-                    <span>{ seconds[1] }</span>
-                </TimerStyle>
+                <TimerStyle />
 
                 { activeCycle ? (
                     <ButtonInterruptStyle onClick={ handleInterruptTimer }>
