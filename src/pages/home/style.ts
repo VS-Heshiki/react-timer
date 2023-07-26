@@ -36,7 +36,7 @@ const InputBaseStyle = styled.input`
     }
 `
 
-export const InputProject = styled(InputBaseStyle)`
+export const InputTask = styled(InputBaseStyle)`
     flex: 1;
 `
 
@@ -82,7 +82,7 @@ export const SeparatorStyle = styled.div`
     justify-content: center;
 `
 
-export const ButtonStartStyle = styled.button`
+export const DefaultButtonStyle = styled.button`
     width: 100%;
     padding: 1.5rem;
 
@@ -93,7 +93,6 @@ export const ButtonStartStyle = styled.button`
     gap: 0.5rem;
     font-weight: bold;
 
-    background: ${props => props.theme['purple-500']};
     color: ${props => props.theme['gray-100']};
     border-radius: 8px;
     border: 0;
@@ -102,12 +101,24 @@ export const ButtonStartStyle = styled.button`
 
     transition: .2s;
 
-    &:not(:disabled):hover {
-        background: ${props => props.theme['purple-700']};
-    }
-
     &:disabled {
         opacity: 0.7;
         cursor: not-allowed;
+    }
+`
+
+export const ButtonStartStyle = styled(DefaultButtonStyle)`
+    background: ${props => props.theme['purple-500']};
+
+    &:not(:disabled):hover {
+        background: ${props => props.theme['purple-700']};
+    }
+`
+
+export const ButtonInterruptStyle = styled(DefaultButtonStyle)`
+    background: ${props => props.theme['red-500']};
+
+    &:hover {
+        background: ${props => props.theme['red-700']};
     }
 `
