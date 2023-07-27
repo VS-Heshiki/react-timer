@@ -62,13 +62,13 @@ export const HistoryTableStyle = styled.div`
 `
 
 const STATUS_COLORS = {
-    green: 'green-500',
-    yellow: 'yellow-500',
-    red: 'red-500'
+    completed: 'green-500',
+    running: 'yellow-500',
+    interrupted: 'red-500'
 }
 
 interface Status {
-    statusColor: keyof typeof STATUS_COLORS
+    status: keyof typeof STATUS_COLORS
 }
 
 export const StatusStyle = styled.span<Status>`
@@ -81,6 +81,6 @@ export const StatusStyle = styled.span<Status>`
         width: 0.5rem;
         height: 0.5rem;
         border-radius: 9999px;
-        background: ${props => props.theme[STATUS_COLORS[props.statusColor]]};
+        background: ${props => props.theme[STATUS_COLORS[props.status]]};
     }
 `

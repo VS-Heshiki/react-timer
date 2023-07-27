@@ -59,6 +59,7 @@ export function CycleContextProvider ({ children }: ChildrenCycleContext) {
     return (
         <CycleContext.Provider
             value={ {
+                cycles,
                 activeCycle,
                 activeCycleId,
                 secondsPassed,

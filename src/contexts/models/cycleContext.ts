@@ -1,6 +1,7 @@
 import { Cycle, NewCycle } from '@/contexts/models'
 
 export type CycleContextTypes = {
+    cycles: Cycle[]
     activeCycle: Cycle | undefined
     activeCycleId: string | null
     secondsPassed: number

@@ -1,6 +1,11 @@
+import { CycleContext } from '@/contexts/CycleContext'
 import { HistoryStyle, HistoryTableStyle, StatusStyle } from '@/pages/history/style'
+import { useContext } from 'react'
+import { formatDistanceToNow } from 'date-fns'
 
 export function History () {
+    const { cycles } = useContext(CycleContext)
+
     return (
         <HistoryStyle>
             <h1>My History</h1>
@@ -15,56 +20,20 @@ export function History () {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Name task</td>
-                            <td>20 Minutes</td>
-                            <td>2 Months ago</td>
-                            <td>
-                                <StatusStyle statusColor='green'>
-                                    Completed
-                                </StatusStyle>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Name task</td>
-                            <td>20 Minutes</td>
-                            <td>2 Months ago</td>
-                            <td>
-                                <StatusStyle statusColor='green'>
-                                    Completed
-                                </StatusStyle>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Name task</td>
-                            <td>20 Minutes</td>
-                            <td>2 Months ago</td>
-                            <td>
-                                <StatusStyle statusColor='green'>
-                                    Completed
-                                </StatusStyle>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Name task</td>
-                            <td>20 Minutes</td>
-                            <td>2 Months ago</td>
-                            <td>
-                                <StatusStyle statusColor='yellow'>
-                                    In progress
-                                </StatusStyle>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Name task</td>
-                            <td>20 Minutes</td>
-                            <td>2 Months ago</td>
-                            <td>
-                                <StatusStyle statusColor='red'>
-                                    Interrupted
-                                </StatusStyle>
-                            </td>
-                        </tr>
+                        { cycles.map(cycle => {
+                            return (
+                                <tr key={ cycle.id }>
+                                    <td>{ cycle.task }</td>
+                                    <td>{ cycle.durationInMinutes } minutes</td>
+                                    <td>{ formatDistanceToNow(cycle.startDate, { addSuffix: true }) }</td>
+                                    <td>
+                                        <StatusStyle status={ cycle.status }>
+                                            { cycle.status }
+                                        </StatusStyle>
+                                    </td>
+                                </tr>
+                            )
+                        }) }
                     </tbody>
                 </table>
             </HistoryTableStyle>
