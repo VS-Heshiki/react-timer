@@ -1,9 +1,8 @@
 import { HomeStyle, ButtonStartStyle, ButtonInterruptStyle } from '@/pages/home/styles'
 import { validationResolver } from '@/pages/home/validation'
 import { HandPalm, Play } from 'phosphor-react'
-import { useEffect, useState } from 'react'
+import { createContext, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { differenceInSeconds } from 'date-fns'
 import * as uuid from 'uuid'
 import { FormStyle } from '@/pages/home/components/FormStyle'
 import { TimerStyle } from '@/pages/home/components/TimerStyle'
@@ -22,6 +21,14 @@ type Cycle = {
     statusDate?: Date
 }
 
+type TimerContextTypes = {
+    activeCycle: Cycle | undefined
+    activeCycleId: string | null
+    setCompletedTask: () => void
+}
+
+export const TimerContext = createContext({} as TimerContextTypes)
+
 export function Home () {
     const { register, handleSubmit, watch, reset } = useForm<InputTimer>({
         resolver: validationResolver,
@@ -31,9 +38,19 @@ export function Home () {
         }
     })
 
+    const setCompletedTask = () => {
+        setCycles(state => state.map(cycle => {
+            if (cycle.id === activeCycleId) {
+                return { ...cycle, status: 'completed', statusDate: new Date() }
+            } else {
+                return cycle
+            }
+        }))
+        setActiveCycleId(null)
+    }
+
     const [cycles, setCycles] = useState<Cycle[]>([])
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-    const [secondsPassed, setSecondsPassed] = useState(0)
 
     const handleFormSubmit = (data: InputTimer) => {
         const newCycle: Cycle = {
@@ -53,52 +70,7 @@ export function Home () {
 
     const activeCycle = cycles.find(cycle => cycle.id === activeCycleId)
 
-    const totalSeconds = activeCycle ? activeCycle.durationInMinutes * 60 : 0
-    const currentSeconds = activeCycle ? totalSeconds - secondsPassed : 0
-
-    useEffect(() => {
-        let interval: number
-
-        if (activeCycle) {
-            interval = setInterval(() => {
-                const differenceSeconds = differenceInSeconds(new Date(), activeCycle.startDate)
-                if (differenceSeconds >= totalSeconds) {
-                    setCycles(state => state.map(cycle => {
-                        if (cycle.id === activeCycleId) {
-                            return { ...cycle, status: 'completed', statusDate: new Date() }
-                        } else {
-                            return cycle
-                        }
-                    }))
-                    setActiveCycleId(null)
-                } else {
-                    setSecondsPassed(differenceSeconds)
-                }
-            }, 1000)
-        }
-
-        return () => {
-            clearInterval(interval)
-        }
-    }, [activeCycle, activeCycleId, totalSeconds])
-
-    const minutesRemaining = Math.floor(currentSeconds / 60)
-    const secondsRemaining = currentSeconds % 60
-
-    const minutes = String(minutesRemaining).padStart(2, '0')
-    const seconds = String(secondsRemaining).padStart(2, '0')
-
     const isDisabledButton = !watch('task')
-
-    useEffect(() => {
-        if (activeCycle?.status === 'running') {
-            document.title = `
-                ${activeCycle.task} - ${minutes}:${seconds}
-            `
-        } else {
-            document.title = 'React Timer'
-        }
-    }, [activeCycle, minutes, seconds])
 
     const handleInterruptTimer = () => {
         setCycles(state => state.map(cycle => {
@@ -116,9 +88,9 @@ export function Home () {
             <form onSubmit={ handleSubmit(handleFormSubmit) }>
 
                 <FormStyle />
-
-                <TimerStyle />
-
+                <TimerContext.Provider value={ { activeCycle, activeCycleId, setCompletedTask } }>
+                    <TimerStyle />
+                </TimerContext.Provider>
                 { activeCycle ? (
                     <ButtonInterruptStyle onClick={ handleInterruptTimer }>
                         <HandPalm size={ 24 } />
