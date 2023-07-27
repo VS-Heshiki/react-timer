@@ -1,6 +1,12 @@
+import { FormContext } from '@/pages/home'
 import { InputDurationInMinutes, InputStyle, InputTask } from '@/pages/home/components/FormStyle/styles'
+import { useFormContext } from 'react-hook-form'
+import { useContext } from 'react'
 
 export function FormStyle () {
+    const { register } = useFormContext()
+    const { activeCycle } = useContext(FormContext)
+
     return (
         <InputStyle>
             <label htmlFor='task'>I'll work in</label>

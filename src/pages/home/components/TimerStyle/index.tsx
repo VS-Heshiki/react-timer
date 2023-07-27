@@ -1,12 +1,10 @@
 import { TimerContext } from '@/pages/home'
 import { SeparatorStyle, TimerComponentStyle } from '@/pages/home/components/TimerStyle/styles'
 import { differenceInSeconds } from 'date-fns'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect } from 'react'
 
 export function TimerStyle () {
-    const { activeCycle, activeCycleId, setCompletedTask } = useContext(TimerContext)
-
-    const [secondsPassed, setSecondsPassed] = useState(0)
+    const { activeCycle, activeCycleId, secondsPassed, setCompletedTask, setSecondsPassedState } = useContext(TimerContext)
 
     const totalSeconds = activeCycle ? activeCycle.durationInMinutes * 60 : 0
     const currentSeconds = activeCycle ? totalSeconds - secondsPassed : 0
@@ -26,7 +24,7 @@ export function TimerStyle () {
                 if (differenceSeconds >= totalSeconds) {
                     setCompletedTask()
                 } else {
-                    setSecondsPassed(differenceSeconds)
+                    setSecondsPassedState(differenceSeconds)
                 }
             }, 1000)
         }
@@ -34,7 +32,7 @@ export function TimerStyle () {
         return () => {
             clearInterval(interval)
         }
-    }, [activeCycle, activeCycleId, setCompletedTask, totalSeconds])
+    }, [activeCycle, activeCycleId, setCompletedTask, setSecondsPassedState, totalSeconds])
 
     useEffect(() => {
         if (activeCycle?.status === 'running') {

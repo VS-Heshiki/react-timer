@@ -2,7 +2,7 @@ import { HomeStyle, ButtonStartStyle, ButtonInterruptStyle } from '@/pages/home/
 import { validationResolver } from '@/pages/home/validation'
 import { HandPalm, Play } from 'phosphor-react'
 import { createContext, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { FormProvider, useForm } from 'react-hook-form'
 import * as uuid from 'uuid'
 import { FormStyle } from '@/pages/home/components/FormStyle'
 import { TimerStyle } from '@/pages/home/components/TimerStyle'
@@ -24,19 +24,37 @@ type Cycle = {
 type TimerContextTypes = {
     activeCycle: Cycle | undefined
     activeCycleId: string | null
+    secondsPassed: number
+    setSecondsPassedState: (seconds: number) => void
     setCompletedTask: () => void
 }
 
 export const TimerContext = createContext({} as TimerContextTypes)
 
+type FormContextTypes = {
+    activeCycle: Cycle | undefined
+}
+
+export const FormContext = createContext({} as FormContextTypes)
+
 export function Home () {
-    const { register, handleSubmit, watch, reset } = useForm<InputTimer>({
+    const [secondsPassed, setSecondsPassed] = useState(0)
+    const [cycles, setCycles] = useState<Cycle[]>([])
+    const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+
+    const TimerForm = useForm<InputTimer>({
         resolver: validationResolver,
         defaultValues: {
             task: '',
             durationInMinutes: 0
         }
     })
+
+    const { handleSubmit, watch, reset } = TimerForm
+
+    const setSecondsPassedState = (seconds: number) => {
+        setSecondsPassed(seconds)
+    }
 
     const setCompletedTask = () => {
         setCycles(state => state.map(cycle => {
@@ -48,9 +66,6 @@ export function Home () {
         }))
         setActiveCycleId(null)
     }
-
-    const [cycles, setCycles] = useState<Cycle[]>([])
-    const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
 
     const handleFormSubmit = (data: InputTimer) => {
         const newCycle: Cycle = {
@@ -70,7 +85,8 @@ export function Home () {
 
     const activeCycle = cycles.find(cycle => cycle.id === activeCycleId)
 
-    const isDisabledButton = !watch('task')
+    const disabledButton = watch('task')
+    const buttonIsDisabled = !disabledButton
 
     const handleInterruptTimer = () => {
         setCycles(state => state.map(cycle => {
@@ -86,9 +102,12 @@ export function Home () {
     return (
         <HomeStyle>
             <form onSubmit={ handleSubmit(handleFormSubmit) }>
-
-                <FormStyle />
-                <TimerContext.Provider value={ { activeCycle, activeCycleId, setCompletedTask } }>
+                <FormProvider { ...TimerForm } >
+                    <FormContext.Provider value={ { activeCycle } }>
+                        <FormStyle />
+                    </FormContext.Provider>
+                </FormProvider>
+                <TimerContext.Provider value={ { activeCycle, activeCycleId, secondsPassed, setSecondsPassedState, setCompletedTask } }>
                     <TimerStyle />
                 </TimerContext.Provider>
                 { activeCycle ? (
@@ -97,7 +116,7 @@ export function Home () {
                         Interrupt!
                     </ButtonInterruptStyle>
                 ) : (
-                    <ButtonStartStyle disabled={ isDisabledButton } type='submit'>
+                    <ButtonStartStyle disabled={ buttonIsDisabled } type='submit'>
                         <Play size={ 24 } />
                         Start!
                     </ButtonStartStyle>
