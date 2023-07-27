@@ -1,10 +1,10 @@
-import { TimerContext } from '@/pages/home'
+import { CycleContext } from '@/contexts/CycleContext'
 import { SeparatorStyle, TimerComponentStyle } from '@/pages/home/components/TimerStyle/styles'
 import { differenceInSeconds } from 'date-fns'
 import { useContext, useEffect } from 'react'
 
 export function TimerStyle () {
-    const { activeCycle, activeCycleId, secondsPassed, setCompletedTask, setSecondsPassedState } = useContext(TimerContext)
+    const { activeCycle, activeCycleId, secondsPassed, setCompletedTask, setSecondsPassedState } = useContext(CycleContext)
 
     const totalSeconds = activeCycle ? activeCycle.durationInMinutes * 60 : 0
     const currentSeconds = activeCycle ? totalSeconds - secondsPassed : 0

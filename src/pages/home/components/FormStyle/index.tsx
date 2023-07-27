@@ -1,4 +1,4 @@
-import { Cycle } from '@/pages/home'
+import { Cycle } from '@/contexts/models'
 import { InputDurationInMinutes, InputStyle, InputTask } from '@/pages/home/components/FormStyle/styles'
 import { useFormContext } from 'react-hook-form'
 
