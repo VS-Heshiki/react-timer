@@ -12,7 +12,7 @@ type InputTimer = {
     durationInMinutes: number
 }
 
-type Cycle = {
+export type Cycle = {
     id: string
     task: string
     durationInMinutes: number
@@ -31,15 +31,9 @@ type TimerContextTypes = {
 
 export const TimerContext = createContext({} as TimerContextTypes)
 
-type FormContextTypes = {
-    activeCycle: Cycle | undefined
-}
-
-export const FormContext = createContext({} as FormContextTypes)
-
 export function Home () {
-    const [secondsPassed, setSecondsPassed] = useState(0)
     const [cycles, setCycles] = useState<Cycle[]>([])
+    const [secondsPassed, setSecondsPassed] = useState(0)
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
 
     const TimerForm = useForm<InputTimer>({
@@ -103,9 +97,7 @@ export function Home () {
         <HomeStyle>
             <form onSubmit={ handleSubmit(handleFormSubmit) }>
                 <FormProvider { ...TimerForm } >
-                    <FormContext.Provider value={ { activeCycle } }>
-                        <FormStyle />
-                    </FormContext.Provider>
+                    <FormStyle activeCycle={ activeCycle } />
                 </FormProvider>
                 <TimerContext.Provider value={ { activeCycle, activeCycleId, secondsPassed, setSecondsPassedState, setCompletedTask } }>
                     <TimerStyle />
