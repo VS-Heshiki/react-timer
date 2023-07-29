@@ -1,5 +1,8 @@
 import { Cycle, CycleContextTypes, NewCycle } from '@/contexts/models'
-import { ReactNode, createContext, useState } from 'react'
+import { ActionTypes } from '@/reducers/actionTypes'
+import { CycleReducer } from '@/reducers/cycleReducer'
+import { ReactNode, createContext, useReducer, useState } from 'react'
+
 import * as uuid from 'uuid'
 
 export const CycleContext = createContext({} as CycleContextTypes)
@@ -9,23 +12,17 @@ type ChildrenCycleContext = {
 }
 
 export function CycleContextProvider ({ children }: ChildrenCycleContext) {
-    const [cycles, setCycles] = useState<Cycle[]>([])
+    const [cyclesState, dispatch] = useReducer(CycleReducer, {
+        cycles: [],
+        activeCycleId: null
+    })
+
     const [secondsPassed, setSecondsPassed] = useState(0)
-    const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+    const { cycles, activeCycleId } = cyclesState
+    const activeCycle = cycles.find(cycle => cycle.id === activeCycleId)
 
     const setSecondsPassedState = (seconds: number) => {
         setSecondsPassed(seconds)
-    }
-
-    const setCompletedTask = () => {
-        setCycles(state => state.map(cycle => {
-            if (cycle.id === activeCycleId) {
-                return { ...cycle, status: 'completed', statusDate: new Date() }
-            } else {
-                return cycle
-            }
-        }))
-        setActiveCycleId(null)
     }
 
     const createNewCycle = (data: NewCycle) => {
@@ -37,24 +34,25 @@ export function CycleContextProvider ({ children }: ChildrenCycleContext) {
             status: 'running'
         }
 
-        setCycles(state => [...state, newCycle])
-        setActiveCycleId(newCycle.id)
-        setSecondsPassed(0)
+        dispatch({
+            type: ActionTypes.CREATE_NEW_CYCLE,
+            payload: {
+                newCycle
+            }
+        })
     }
 
-    const activeCycle = cycles.find(cycle => cycle.id === activeCycleId)
+    const setCompletedTask = () => {
+        dispatch({
+            type: ActionTypes.SET_COMPLETED_TASK
+        })
+    }
 
     const handleInterruptTimer = () => {
-        setCycles(state => state.map(cycle => {
-            if (cycle.id === activeCycleId) {
-                return { ...cycle, status: 'interrupted', statusDate: new Date() }
-            } else {
-                return cycle
-            }
-        }))
-        setActiveCycleId(null)
+        dispatch({
+            type: ActionTypes.SET_INTERRUPTED_TASK
+        })
     }
-
 
     return (
         <CycleContext.Provider
