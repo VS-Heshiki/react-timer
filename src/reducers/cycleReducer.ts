@@ -9,8 +9,8 @@ export function CycleReducer (state: CycleState, action: any) {
     switch (action.type) {
         case ActionTypes.CREATE_NEW_CYCLE: {
             return produce(state, (draft) => {
-                draft.cycles.push(action.payload.cycle)
-                draft.activeCycleId = action.payload.cycle.id
+                draft.cycles.push(action.payload.newCycle)
+                draft.activeCycleId = action.payload.newCycle.id
             })
         }
 
@@ -21,8 +21,8 @@ export function CycleReducer (state: CycleState, action: any) {
                 return state
             }
 
-            return produce(state, draft => {
-                draft.cycles[activeCycleIndex].status === 'completed'
+            return produce(state, (draft) => {
+                draft.cycles[activeCycleIndex].status = 'completed'
                 draft.activeCycleId = null
             })
         }
@@ -34,8 +34,8 @@ export function CycleReducer (state: CycleState, action: any) {
                 return state
             }
 
-            return produce(state, draft => {
-                draft.cycles[activeCycleIndex].status === 'interrupted'
+            return produce(state, (draft) => {
+                draft.cycles[activeCycleIndex].status = 'interrupted'
                 draft.activeCycleId = null
             })
         }
